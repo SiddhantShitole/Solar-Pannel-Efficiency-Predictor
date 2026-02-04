@@ -55,10 +55,13 @@ if menu == "🌍 Smart Forecast (Live API)":
                 c2.metric("🌡️ Air Temp", f"{air_temp} °C")
                 c3.metric("🔥 Est. Panel Temp", f"{mod_temp:.1f} °C")
 
-                # Step D: Predict
-                prediction = model.predict([[irr_input, air_temp, mod_temp]])[0]
+               # Step D: Predict
+                raw_prediction = model.predict([[irr_input, air_temp, mod_temp]])[0]
                 
-                # Store prediction in session state so it stays when we click other buttons
+                # SCALE DOWN: Convert "Power Plant" size to "Home" size (5kW system)
+                prediction = raw_prediction / 45000 
+                
+                # Store prediction in session state
                 st.session_state['prediction'] = prediction
                 st.session_state['has_predicted'] = True
 
@@ -75,9 +78,8 @@ if menu == "🌍 Smart Forecast (Live API)":
         
         st.info("Step 2: Enter your actual inverter reading to check efficiency.")
         
-        # User enters actual value
-        actual = st.number_input("🔌 Actual Power Generation (kW)", min_value=0.0, format="%.2f")
-
+        # User enters actual value (Small numbers now, like 3.5 or 4.2)
+        actual = st.number_input("🔌 Actual Power Generation (kW)", min_value=0.0, max_value=10.0, step=0.1, format="%.2f")
         if actual > 0:
             # Logic: Calculate Efficiency
             efficiency = (actual / pred) * 100
@@ -105,5 +107,9 @@ elif menu == "🔮 Manual Simulation":
     mod_temp = col3.slider("Module Temperature (°C)", 20.0, 75.0, 50.0)
 
     if st.button("Simulate"):
-        pred = model.predict([[irr, amb_temp, mod_temp]])[0]
+        raw_pred = model.predict([[irr, amb_temp, mod_temp]])[0]
+        
+        # SAME SCALING here so both modes match!
+        pred = raw_pred / 45000  
+        
         st.success(f"Expected Power: {pred:,.2f} kW")

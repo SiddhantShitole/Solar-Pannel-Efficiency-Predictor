@@ -3,7 +3,7 @@ import pickle
 import requests
 import pandas as pd
 
-# 1. Load Model
+#Load Model
 try:
     model = pickle.load(open('solar_model.pkl', 'rb'))
 except FileNotFoundError:
@@ -16,7 +16,7 @@ st.title("☀️ Smart Solar Forecaster & Fault Detector")
 # Sidebar
 menu = st.sidebar.radio("Mode", ["🌍 Smart Forecast (Live API)", "🔮 Manual Simulation"])
 
-# --- MODE 1: LIVE API (Upgraded) ---
+# MODE 1: LIVE API (Upgraded)
 if menu == "🌍 Smart Forecast (Live API)":
     st.header("Real-Time Prediction & Efficiency Check 🌍")
     st.info("Step 1: Get the AI Prediction based on live weather.")
@@ -68,7 +68,7 @@ if menu == "🌍 Smart Forecast (Live API)":
         except Exception as e:
             st.error(f"Error: {e}")
 
-    # --- NEW FEATURE: EFFICIENCY CHECKER ---
+    # FEATURE: EFFICIENCY CHECKER 
     # We check if a prediction exists in the session
     if st.session_state.get('has_predicted'):
         pred = st.session_state['prediction']
@@ -88,7 +88,7 @@ if menu == "🌍 Smart Forecast (Live API)":
             st.write(f"### Efficiency Rating: {efficiency:.1f}%")
 
             # The "Good or Bad" Logic
-            if efficiency >= 95:
+            if efficiency >= 90:
                 st.success("✅ EXCELLENT: System is performing optimally!")
             elif efficiency >= 80:
                 st.warning(f"⚠️ FAIR: You are losing {loss:.2f} kW. Consider cleaning panels.")
@@ -98,7 +98,7 @@ if menu == "🌍 Smart Forecast (Live API)":
             # Progress Bar for Visual Appeal
             st.progress(min(efficiency / 100, 1.0))
 
-# --- MODE 2: MANUAL ---
+# MODE 2: MANUAL 
 elif menu == "🔮 Manual Simulation":
     st.header("🔮 Manual Simulation")
     col1, col2, col3 = st.columns(3)
